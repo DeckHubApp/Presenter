@@ -1,37 +1,65 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Slidable.Presenter.Authentication;
 using Slidable.Presenter.Models;
 
 namespace Slidable.Presenter.Controllers
 {
-    public class HomeController : Controller
+    [Route("")]
+    [Authorize]
+    public class PresentController : Controller
     {
-        public IActionResult Index()
+        [HttpGet("{handle}/{slug}")]
+        public IActionResult PresenterView(string handle, string slug, CancellationToken ct)
         {
-            return View();
+            var user = User.FindFirst(ShtikClaimTypes.Handle)?.Value;
+            if (!handle.Equals(user, StringComparison.OrdinalIgnoreCase))
+            {
+                return NotFound();
+            }
+//            var (show, questions) = await MultiTask.WhenAll(_shows.Get(user, slug, ct), _questions.GetQuestionsForShow(user, slug, ct));
+//            if (show == null)
+//            {
+//                return NotFound();
+//            }
+            var viewModel = new PresenterViewModel
+            {
+            };
+            return View(viewModel);
         }
 
-        public IActionResult About()
+        [HttpPost("{handle}/start")]
+        public async Task<IActionResult> Start(string handle, [FromBody] StartShow startShow, CancellationToken ct)
         {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
+            startShow.Presenter = handle;
+            var show = await _shows.Start(startShow, ct).ConfigureAwait(false);
+            return CreatedAtAction("Show", "Live", new {presenter = startShow.Presenter, slug = startShow.Slug}, show);
         }
 
-        public IActionResult Contact()
+        [HttpPut("{handle}/{slug}/{number}")]
+        public async Task<IActionResult> ShowSlide(string handle, string slug, int number, CancellationToken ct)
         {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            byte[] content;
+            using (var stream = new MemoryStream(65536))
+            {
+                await Request.Body.CopyToAsync(stream, ct);
+                content = stream.ToArray();
+            }
+            var (ok, uri) = await MultiTask.WhenAll(
+                _shows.ShowSlide(handle, slug, number, ct),
+                _slides.Upload(handle, slug, number, Request.ContentType, content, ct)
+            ).ConfigureAwait(false);
+            // TODO: Post onto Redis message bus
+//            await _hubContext.SendSlideAvailable(handle, slug, number).ConfigureAwait(false);
+            if (!ok) return NotFound();
+            return Accepted(uri);
         }
     }
 }

@@ -1,65 +1,80 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Slidable.Presenter.Authentication;
+using Slidable.Presenter.Clients;
 using Slidable.Presenter.Models;
 
 namespace Slidable.Presenter.Controllers
 {
     [Route("")]
-    [Authorize]
-    public class PresentController : Controller
+    public class HomeController : Controller
     {
+        private readonly IShowsClient _shows;
+        private readonly RedisPublisher _redis;
+        private readonly IApiKeyProvider _apiKeyProvider;
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(IShowsClient shows, RedisPublisher redis, IApiKeyProvider apiKeyProvider, ILogger<HomeController> logger)
+        {
+            _shows = shows;
+            _redis = redis;
+            _apiKeyProvider = apiKeyProvider;
+            _logger = logger;
+        }
+
         [HttpGet("{handle}/{slug}")]
+        [Authorize]
         public IActionResult PresenterView(string handle, string slug, CancellationToken ct)
         {
-            var user = User.FindFirst(ShtikClaimTypes.Handle)?.Value;
-            if (!handle.Equals(user, StringComparison.OrdinalIgnoreCase))
+            if (!IsCurrentUser(handle))
             {
                 return NotFound();
             }
-//            var (show, questions) = await MultiTask.WhenAll(_shows.Get(user, slug, ct), _questions.GetQuestionsForShow(user, slug, ct));
-//            if (show == null)
-//            {
-//                return NotFound();
-//            }
-            var viewModel = new PresenterViewModel
-            {
-            };
-            return View(viewModel);
+            return View();
         }
 
         [HttpPost("{handle}/start")]
         public async Task<IActionResult> Start(string handle, [FromBody] StartShow startShow, CancellationToken ct)
         {
+            if (!ValidateApiKey(handle))
+            {
+                return NotFound();
+            }
             startShow.Presenter = handle;
-            var show = await _shows.Start(startShow, ct).ConfigureAwait(false);
-            return CreatedAtAction("Show", "Live", new {presenter = startShow.Presenter, slug = startShow.Slug}, show);
+            await _shows.Start(startShow, ct).ConfigureAwait(false);
+            return StatusCode(201);
         }
 
         [HttpPut("{handle}/{slug}/{number}")]
         public async Task<IActionResult> ShowSlide(string handle, string slug, int number, CancellationToken ct)
         {
-            byte[] content;
-            using (var stream = new MemoryStream(65536))
+            if (!ValidateApiKey(handle))
             {
-                await Request.Body.CopyToAsync(stream, ct);
-                content = stream.ToArray();
+                return NotFound();
             }
-            var (ok, uri) = await MultiTask.WhenAll(
-                _shows.ShowSlide(handle, slug, number, ct),
-                _slides.Upload(handle, slug, number, Request.ContentType, content, ct)
-            ).ConfigureAwait(false);
-            // TODO: Post onto Redis message bus
-//            await _hubContext.SendSlideAvailable(handle, slug, number).ConfigureAwait(false);
-            if (!ok) return NotFound();
-            return Accepted(uri);
+            await _shows.ShowSlide(handle, slug, number, ct);
+            _redis.PublishSlideAvailable(handle, slug, number);
+            return Accepted();
+        }
+
+        private bool IsCurrentUser(string handle)
+        {
+            var user = User.FindFirst(SlidableClaimTypes.Handle)?.Value;
+            return handle.Equals(user, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool ValidateApiKey(string handle)
+        {
+            var apiKey = Request.Headers["API-Key"];
+
+            if (_apiKeyProvider.CheckBase64(handle, apiKey)) return true;
+
+            _logger.LogWarning(EventIds.PresenterInvalidApiKey, "Invalid API key.");
+            return false;
         }
     }
 }

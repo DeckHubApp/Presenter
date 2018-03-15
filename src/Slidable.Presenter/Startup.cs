@@ -1,22 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Slidable.Presenter.Authentication;
+using StackExchange.Redis;
 
 namespace Slidable.Presenter
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private static ConnectionMultiplexer _connectionMultiplexer;
+        private readonly IHostingEnvironment _env;
+
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
+            _env = env;
             Configuration = configuration;
         }
 
@@ -25,15 +27,40 @@ namespace Slidable.Presenter
         [UsedImplicitly]
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            var redisHost = Configuration.GetSection("Redis").GetValue<string>("Host");
+            var redisPort = Configuration.GetSection("Redis").GetValue<int>("Port");
+            if (redisPort == 0)
+            {
+                redisPort = 6379;
+            }
 
-            services.AddAuthentication(options =>
+            _connectionMultiplexer = ConnectionMultiplexer.Connect($"{redisHost}:{redisPort}");
+
+            services.AddSingleton(_connectionMultiplexer);
+            services.AddSingleton<RedisPublisher>();
+
+            services.AddSingleton<IApiKeyProvider, ApiKeyProvider>();
+
+            if (!_env.IsDevelopment())
+            {
+                var dpBuilder = services.AddDataProtection().SetApplicationName("slidable");
+
+                if (_connectionMultiplexer != null)
                 {
-                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = ApiKeyAuthenticationDefaults.AuthenticationScheme;
-                })
-                .AddApiKey(o => o.ApiKeyHashPhrase = Configuration["Security:ApiKeyHashPhrase"])
+                    dpBuilder.PersistKeysToRedis(_connectionMultiplexer, "DataProtection:Keys");
+                }
+            }
+            else
+            {
+                services.AddDataProtection()
+                    .DisableAutomaticKeyGeneration()
+                    .SetApplicationName("slidable");
+            }
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie();
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         [UsedImplicitly]
@@ -46,6 +73,12 @@ namespace Slidable.Presenter
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+            }
+
+            var pathBase = Configuration["Runtime:PathBase"];
+            if (!string.IsNullOrEmpty(pathBase))
+            {
+                app.UsePathBase(pathBase);
             }
 
             app.UseStaticFiles();

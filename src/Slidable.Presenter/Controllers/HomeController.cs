@@ -10,7 +10,6 @@ using Slidable.Presenter.Models;
 
 namespace Slidable.Presenter.Controllers
 {
-    [Route("")]
     public class HomeController : Controller
     {
         private readonly IShowsClient _shows;

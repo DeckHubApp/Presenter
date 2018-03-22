@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Slidable.Presenter.Authentication;
+using Slidable.Presenter.Clients;
+using Slidable.Presenter.Options;
 using StackExchange.Redis;
 
 namespace Slidable.Presenter
@@ -40,6 +42,8 @@ namespace Slidable.Presenter
             services.AddSingleton<RedisPublisher>();
 
             services.AddSingleton<IApiKeyProvider, ApiKeyProvider>();
+            services.AddSingleton<IShowsClient, ShowsClient>();
+            services.Configure<ServiceOptions>(Configuration.GetSection("Services"));
 
             if (!_env.IsDevelopment())
             {

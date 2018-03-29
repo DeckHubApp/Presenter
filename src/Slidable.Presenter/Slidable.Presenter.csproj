@@ -5,6 +5,9 @@
     <TypeScriptToolsVersion>2.6</TypeScriptToolsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="wwwroot\js\presenter.ts" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.0-preview1-final" />
@@ -38,5 +41,8 @@
     <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation-unobtrusive\.bower.json" />
     <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.js" />
     <_ContentIncludedByDefault Remove="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\js\presenter.ts" />
   </ItemGroup>
 </Project>

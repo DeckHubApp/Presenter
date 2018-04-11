@@ -7,15 +7,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Slidable.Presenter.Authentication;
-using Slidable.Presenter.Clients;
+using Slidable.Presenter.Internals;
+using Slidable.Presenter.Messaging;
 using Slidable.Presenter.Options;
+using Slidable.Presenter.Services;
 using StackExchange.Redis;
 
 namespace Slidable.Presenter
 {
     public class Startup
     {
-        private static ConnectionMultiplexer _connectionMultiplexer;
         private readonly IHostingEnvironment _env;
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
@@ -29,40 +30,21 @@ namespace Slidable.Presenter
         [UsedImplicitly]
         public void ConfigureServices(IServiceCollection services)
         {
-            var redisHost = Configuration.GetSection("Redis").GetValue<string>("Host");
-            var redisPort = Configuration.GetSection("Redis").GetValue<int>("Port");
-            if (redisPort == 0)
-            {
-                redisPort = 6379;
-            }
+            services.AddSingleton<IIdentityPaths, IdentityPaths>();
 
-            _connectionMultiplexer = ConnectionMultiplexer.Connect($"{redisHost}:{redisPort}");
+            ConfigureAuth(services);
 
-            services.AddSingleton(_connectionMultiplexer);
+            var connectionMultiplexer = ConfigureRedis(services);
+
+            ConfigureDataProtection(services, connectionMultiplexer);
+
+            services.Configure<MessagingOptions>(Configuration.GetSection("Messaging"));
+
+            services.AddSingleton<IMessageBus, MessageBus>();
+
             services.AddSingleton<RedisPublisher>();
 
             services.AddSingleton<IApiKeyProvider, ApiKeyProvider>();
-            services.AddSingleton<IShowsClient, ShowsClient>();
-            services.Configure<ServiceOptions>(Configuration.GetSection("Services"));
-
-            if (!_env.IsDevelopment())
-            {
-                var dpBuilder = services.AddDataProtection().SetApplicationName("slidable");
-
-                if (_connectionMultiplexer != null)
-                {
-                    dpBuilder.PersistKeysToRedis(_connectionMultiplexer, "DataProtection:Keys");
-                }
-            }
-            else
-            {
-                services.AddDataProtection()
-                    .DisableAutomaticKeyGeneration()
-                    .SetApplicationName("slidable");
-            }
-
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -87,7 +69,14 @@ namespace Slidable.Presenter
 
             app.UseStaticFiles();
 
-            app.UseAuthentication();
+            if (env.IsDevelopment())
+            {
+                app.UseMiddleware<BypassAuthMiddleware>();
+            }
+            else
+            {
+                app.UseAuthentication();
+            }
 
             app.UseMvc(routes =>
             {
@@ -95,6 +84,53 @@ namespace Slidable.Presenter
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+       }
+
+        private void ConfigureAuth(IServiceCollection services)
+        {
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie();
         }
+
+        private ConnectionMultiplexer ConfigureRedis(IServiceCollection services)
+        {
+            var redisHost = Configuration.GetSection("Redis").GetValue<string>("Host");
+            if (!string.IsNullOrWhiteSpace(redisHost))
+            {
+                var redisPort = Configuration.GetSection("Redis").GetValue<int>("Port");
+                if (redisPort == 0)
+                {
+                    redisPort = 6379;
+                }
+
+                var connectionMultiplexer = ConnectionMultiplexer.Connect($"{redisHost}:{redisPort}");
+                services.AddSingleton(connectionMultiplexer);
+                return connectionMultiplexer;
+            }
+
+            return null;
+        }
+
+        private void ConfigureDataProtection(IServiceCollection services, ConnectionMultiplexer connectionMultiplexer)
+        {
+            if (!_env.IsDevelopment())
+            {
+                var dpBuilder = services.AddDataProtection().SetApplicationName("slidable");
+
+                if (connectionMultiplexer != null)
+                {
+                    dpBuilder.PersistKeysToRedis(connectionMultiplexer, "DataProtection:Keys");
+                }
+            }
+            else
+            {
+                services.AddDataProtection()
+                    .DisableAutomaticKeyGeneration()
+                    .SetApplicationName("slidable");
+            }
+        }
+
     }
+
+
 }

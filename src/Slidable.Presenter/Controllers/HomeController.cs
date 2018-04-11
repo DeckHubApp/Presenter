@@ -5,58 +5,66 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Slidable.Presenter.Authentication;
-using Slidable.Presenter.Clients;
+using Slidable.Presenter.Messaging;
 using Slidable.Presenter.Models;
 
 namespace Slidable.Presenter.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IShowsClient _shows;
+        private readonly IMessageBus _messageBus;
         private readonly RedisPublisher _redis;
         private readonly IApiKeyProvider _apiKeyProvider;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(IShowsClient shows, RedisPublisher redis, IApiKeyProvider apiKeyProvider, ILogger<HomeController> logger)
+        public HomeController(IMessageBus messageBus, RedisPublisher redis, IApiKeyProvider apiKeyProvider, ILogger<HomeController> logger)
         {
-            _shows = shows;
+            _messageBus = messageBus;
             _redis = redis;
             _apiKeyProvider = apiKeyProvider;
             _logger = logger;
         }
 
-        [HttpGet("{handle}/{slug}")]
+        [HttpGet("{place}/{presenter}/{slug}")]
         [Authorize]
-        public IActionResult PresenterView(string handle, string slug, CancellationToken ct)
+        public IActionResult PresenterView(string place, string presenter, string slug, CancellationToken ct)
         {
-            if (!IsCurrentUser(handle))
+            if (!IsCurrentUser(presenter))
             {
                 return NotFound();
             }
-            return View();
+
+            var model = new PresenterViewModel
+            {
+                Place = place,
+                Presenter = presenter,
+                Slug = slug
+            };
+            return View(model);
         }
 
-        [HttpPost("{handle}/start")]
-        public async Task<IActionResult> Start(string handle, [FromBody] StartShow startShow, CancellationToken ct)
+        [HttpPost("{presenter}/start")]
+        public async Task<IActionResult> Start(string presenter, [FromBody] StartShow startShow, CancellationToken ct)
         {
-            if (!ValidateApiKey(handle))
+            if (!ValidateApiKey(presenter))
             {
                 return NotFound();
             }
-            startShow.Presenter = handle;
-            await _shows.Start(startShow, ct).ConfigureAwait(false);
+            startShow.Presenter = presenter;
+            await _messageBus.StartShow(startShow);
             return StatusCode(201);
         }
 
-        [HttpPut("{handle}/{slug}/{number}")]
-        public async Task<IActionResult> ShowSlide(string handle, string slug, int number, CancellationToken ct)
+        [HttpPut("{place}/{presenter}/{slug}/{number}")]
+        public async Task<IActionResult> ShowSlide(string place, string presenter, string slug, int number, CancellationToken ct)
         {
-            if (!ValidateApiKey(handle))
+            if (!ValidateApiKey(presenter))
             {
                 return NotFound();
             }
-            await _shows.ShowSlide(handle, slug, number, ct);
-            _redis.PublishSlideAvailable(handle, slug, number);
+
+            await _messageBus.SlideAvailable(place, presenter, slug, number);
+            _redis.PublishSlideAvailable(place, presenter, slug, number);
             return Accepted();
         }
 

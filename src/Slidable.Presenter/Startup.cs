@@ -46,7 +46,9 @@ namespace Slidable.Presenter
 
             services.AddSingleton<IApiKeyProvider, ApiKeyProvider>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddMetrics();
         }
 
         [UsedImplicitly]

@@ -13,14 +13,12 @@ namespace Slidable.Presenter.Controllers
     public class HomeController : Controller
     {
         private readonly IMessageBus _messageBus;
-        private readonly RedisPublisher _redis;
         private readonly IApiKeyProvider _apiKeyProvider;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(IMessageBus messageBus, RedisPublisher redis, IApiKeyProvider apiKeyProvider, ILogger<HomeController> logger)
+        public HomeController(IMessageBus messageBus, IApiKeyProvider apiKeyProvider, ILogger<HomeController> logger)
         {
             _messageBus = messageBus;
-            _redis = redis;
             _apiKeyProvider = apiKeyProvider;
             _logger = logger;
         }
@@ -64,7 +62,6 @@ namespace Slidable.Presenter.Controllers
             }
 
             await _messageBus.SlideAvailable(place, presenter, slug, number);
-            _redis.PublishSlideAvailable(place, presenter, slug, number);
             return Accepted();
         }
 

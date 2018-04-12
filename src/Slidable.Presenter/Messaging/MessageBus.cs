@@ -68,7 +68,7 @@ namespace Slidable.Presenter.Messaging
             {
                 var data = MessagePackSerializer.Serialize(slide);
                 var message = new Message(data);
-                await _startClient.SendAsync(message).ConfigureAwait(false);
+                await _slideClient.SendAsync(message).ConfigureAwait(false);
             }
             catch (System.Exception ex)
             {

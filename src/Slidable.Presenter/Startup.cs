@@ -42,8 +42,6 @@ namespace Slidable.Presenter
 
             services.AddSingleton<IMessageBus, MessageBus>();
 
-            services.AddSingleton<RedisPublisher>();
-
             services.AddSingleton<IApiKeyProvider, ApiKeyProvider>();
 
             services.AddMvc()

@@ -3,7 +3,7 @@ using App.Metrics;
 using App.Metrics.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace SlidableLive
+namespace Slidable.Presenter
 {
     public static class StandardMetricsExtensions
     {

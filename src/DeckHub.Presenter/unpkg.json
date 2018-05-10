@@ -1,6 +1,6 @@
 {
   "vue": {
-    "version": "vue@2.5.16",
+    "version": "2.5.16",
     "files": [
       {
         "file": "/dist/vue.js",
@@ -17,36 +17,36 @@
     ]
   },
   "bootstrap": {
-    "version": "bootstrap@4.0.0",
+    "version": "4.1.1",
     "files": [
       {
         "file": "/dist/js/bootstrap.bundle.js",
-        "cdn": "https://unpkg.com/bootstrap@4.0.0/dist/js/bootstrap.bundle.js",
+        "cdn": "https://unpkg.com/bootstrap@4.1.1/dist/js/bootstrap.bundle.js",
         "local": "wwwroot/lib/bootstrap/js/bootstrap.bundle.js",
-        "integrity": "sha384-jsto7BKLxIckSZGIaMHhrgLyfPsKCpgz/n/8+LSM7Wu3jcOYL9aLBn42goF34TWC"
+        "integrity": "sha384-ZJlgHXttXFzQcd6QwVtO0p59YCMQNo2nw9enFAUY9ceputt+veTyPD/LOwm3Xifo"
       },
       {
         "file": "/dist/js/bootstrap.bundle.js.map",
-        "cdn": "https://unpkg.com/bootstrap@4.0.0/dist/js/bootstrap.bundle.js.map",
+        "cdn": "https://unpkg.com/bootstrap@4.1.1/dist/js/bootstrap.bundle.js.map",
         "local": "wwwroot/lib/bootstrap/js/bootstrap.bundle.js.map",
-        "integrity": "sha384-g9ztExxhvbat0r2sVl3YnTomPFdx0ikBVBjY1OtEBMo6N9ElPhEfyVq0rX901seU"
+        "integrity": "sha384-aCLG6OfMbSTFjFZPQvZHO2G8+8Z8N7I1BQc/Pquz5yjN5T12oaP+fjnYDpKmzQBW"
       },
       {
         "file": "/dist/js/bootstrap.bundle.min.js",
-        "cdn": "https://unpkg.com/bootstrap@4.0.0/dist/js/bootstrap.bundle.min.js",
+        "cdn": "https://unpkg.com/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js",
         "local": "wwwroot/lib/bootstrap/js/bootstrap.bundle.min.js",
-        "integrity": "sha384-feJI7QwhOS+hwpX2zkaeJQjeiwlhOP+SdQDqhgvvo1DsjtiSQByFdThsxO669S2D"
+        "integrity": "sha384-u/bQvRA/1bobcXlcEYpsEdFVK/vJs3+T+nXLsBYJthmdBuavHvAW6UsmqO2Gd/F9"
       },
       {
         "file": "/dist/js/bootstrap.bundle.min.js.map",
-        "cdn": "https://unpkg.com/bootstrap@4.0.0/dist/js/bootstrap.bundle.min.js.map",
+        "cdn": "https://unpkg.com/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js.map",
         "local": "wwwroot/lib/bootstrap/js/bootstrap.bundle.min.js.map",
-        "integrity": "sha384-cH2LWMiZFzgQvUzyTqMxSL03OqQ9k80dQkcpCdjLA9S1xHxIW0vcVUITrXTQN0SE"
+        "integrity": "sha384-Iq+pr0sO1ocM3RLLmbptnjwean+3GAj4WF5IS8LpyX6bHbZ5X8NmJ4qEpZhTrMoI"
       }
     ]
   },
   "jquery": {
-    "version": "jquery@3.3.1",
+    "version": "3.3.1",
     "files": [
       {
         "file": "/dist/jquery.slim.js",
@@ -68,8 +68,25 @@
       }
     ]
   },
+  "bootswatch/darkly": {
+    "version": "4.1.1",
+    "files": [
+      {
+        "file": "/dist/darkly/bootstrap.css",
+        "cdn": "https://unpkg.com/bootswatch@4.1.1/dist/darkly/bootstrap.css",
+        "local": "wwwroot/lib/bootswatch/darkly/bootstrap.css",
+        "integrity": "sha384-s2Q5tavhI08A4qQ3O9vdOZUhuzZ8qaBdGy3CWiwuVyYJLli1Yo9PZOhuikGX0lQD"
+      },
+      {
+        "file": "/dist/darkly/bootstrap.min.css",
+        "cdn": "https://unpkg.com/bootswatch@4.1.1/dist/darkly/bootstrap.min.css",
+        "local": "wwwroot/lib/bootswatch/darkly/bootstrap.min.css",
+        "integrity": "sha384-ae362vOLHy2F1EfJtpMbNW0i9pNM1TP2l5O4VGYYiLJKsaejqVWibbP6BSf0UU5i"
+      }
+    ]
+  },
   "font-awesome": {
-    "version": "font-awesome@4.7.0",
+    "version": "4.7.0",
     "files": [
       {
         "file": "/css/font-awesome.css",
@@ -127,49 +144,61 @@
       }
     ]
   },
-  "bootswatch/darkly": {
-    "version": "bootswatch@4.0.0",
+  "@reactivex/rxjs/global": {
+    "version": "6.1.0",
     "files": [
       {
-        "file": "/dist/darkly/bootstrap.css",
-        "cdn": "https://unpkg.com/bootswatch@4.0.0/dist/darkly/bootstrap.css",
-        "local": "wwwroot/lib/bootswatch/darkly/bootstrap.css",
-        "integrity": "sha384-MtDYCLkEI7u+9Bnye5jvJeQwVrOZQ2QFGEyyNY7gZg9cn7lU27HCFhlh3C41GW6o"
+        "file": "/dist/global/rxjs.umd.js",
+        "cdn": "https://unpkg.com/@reactivex/rxjs@6.1.0/dist/global/rxjs.umd.js",
+        "local": "wwwroot/lib/@reactivex/rxjs/global/rxjs.umd.js",
+        "integrity": "sha384-zFBqFvw7E+nNbN2C1iM60Z7IsDUnYQfuyKjt0lhjy8M66eOMZFKPKnbBLen6ON5e"
       },
       {
-        "file": "/dist/darkly/bootstrap.min.css",
-        "cdn": "https://unpkg.com/bootswatch@4.0.0/dist/darkly/bootstrap.min.css",
-        "local": "wwwroot/lib/bootswatch/darkly/bootstrap.min.css",
-        "integrity": "sha384-p8bH4RlA/kdF4wbAoep+/6VeOQI2IAWa9zLjTIQbQLv2FuCjX/W/FkdYdeKISDvK"
+        "file": "/dist/global/rxjs.umd.js.map",
+        "cdn": "https://unpkg.com/@reactivex/rxjs@6.1.0/dist/global/rxjs.umd.js.map",
+        "local": "wwwroot/lib/@reactivex/rxjs/global/rxjs.umd.js.map",
+        "integrity": "sha384-4/hgRN5FOr4tDVJa1WxI3zzp0SMiqpPsdNLzgbxh0AqKiECY4Q/rZx7bXoNxdHyN"
+      },
+      {
+        "file": "/dist/global/rxjs.umd.min.js",
+        "cdn": "https://unpkg.com/@reactivex/rxjs@6.1.0/dist/global/rxjs.umd.min.js",
+        "local": "wwwroot/lib/@reactivex/rxjs/global/rxjs.umd.min.js",
+        "integrity": "sha384-3mTCb4tOUiB0QBR1yqRmwG25KQ5/U1jp8mqxZ8TH6QlAwPA49U9ZhbfCVAp2E70s"
+      },
+      {
+        "file": "/dist/global/rxjs.umd.min.js.map",
+        "cdn": "https://unpkg.com/@reactivex/rxjs@6.1.0/dist/global/rxjs.umd.min.js.map",
+        "local": "wwwroot/lib/@reactivex/rxjs/global/rxjs.umd.min.js.map",
+        "integrity": "sha384-3spPCD2LwIl1bzByZu25CdmbkQyEtm0FDdVOH7pvIaBcyjUNJe6TsDegIxA4u4o9"
       }
     ]
   },
-  "@reactivex/rxjs/global": {
-    "version": "@reactivex",
+  "@aspnet/signalr/browser": {
+    "version": "1.0.0-rc1-update1",
     "files": [
       {
-        "file": "/dist/global/Rx.js",
-        "cdn": "https://unpkg.com/@reactivex/rxjs@5.5.9/dist/global/Rx.js",
-        "local": "wwwroot/lib/@reactivex/rxjs/global/Rx.js",
-        "integrity": "sha384-nuYbgWXccVZPBz1oet0tNkUJtWVqWfHeKYjpTnbI3XqaDaG2hTMeFIw4SqxSBePT"
+        "file": "/dist/browser/signalr.js",
+        "cdn": "https://unpkg.com/@aspnet/signalr@1.0.0-rc1-update1/dist/browser/signalr.js",
+        "local": "wwwroot/lib/@aspnet/signalr/browser/signalr.js",
+        "integrity": "sha384-vvxwxIsc0u36fcJvMehYNtYF05a+Vt5gPAfJER/gVCPNsCj0xCXr9WS+bIZoi7xZ"
       },
       {
-        "file": "/dist/global/Rx.js.map",
-        "cdn": "https://unpkg.com/@reactivex/rxjs@5.5.9/dist/global/Rx.js.map",
-        "local": "wwwroot/lib/@reactivex/rxjs/global/Rx.js.map",
-        "integrity": "sha384-RT9DIQIQQNOLdj0LJaW8GRd1oBZ2XflRAv1zY3SNi4zUgsFF5UQt4qNpx0YH8KlX"
+        "file": "/dist/browser/signalr.js.map",
+        "cdn": "https://unpkg.com/@aspnet/signalr@1.0.0-rc1-update1/dist/browser/signalr.js.map",
+        "local": "wwwroot/lib/@aspnet/signalr/browser/signalr.js.map",
+        "integrity": "sha384-lqNPIiWE17eFHROP1HaRLPNty5wP95T9nTvL/Qk7y9ECVanbeVyad7KyJppoJbSd"
       },
       {
-        "file": "/dist/global/Rx.min.js",
-        "cdn": "https://unpkg.com/@reactivex/rxjs@5.5.9/dist/global/Rx.min.js",
-        "local": "wwwroot/lib/@reactivex/rxjs/global/Rx.min.js",
-        "integrity": "sha384-LYPfyX2q+SNly4K2wqjt+demgf0pBMCCd0C14kY9SIoEERaTRdmoknW+yZYZ5WPV"
+        "file": "/dist/browser/signalr.min.js",
+        "cdn": "https://unpkg.com/@aspnet/signalr@1.0.0-rc1-update1/dist/browser/signalr.min.js",
+        "local": "wwwroot/lib/@aspnet/signalr/browser/signalr.min.js",
+        "integrity": "sha384-AwmpA5VV/+hRfLYvLbL95sXfajv7ny+Uz3TiOlHVsQ/F9qMRaTM60T0joCnBbMp3"
       },
       {
-        "file": "/dist/global/Rx.min.js.map",
-        "cdn": "https://unpkg.com/@reactivex/rxjs@5.5.9/dist/global/Rx.min.js.map",
-        "local": "wwwroot/lib/@reactivex/rxjs/global/Rx.min.js.map",
-        "integrity": "sha384-VS3BUVmVtwI0majFlSx0/v7mfIar4tLV1zVJxx+BELseV/NAOITivr3le2X2nT8k"
+        "file": "/dist/browser/signalr.min.js.map",
+        "cdn": "https://unpkg.com/@aspnet/signalr@1.0.0-rc1-update1/dist/browser/signalr.min.js.map",
+        "local": "wwwroot/lib/@aspnet/signalr/browser/signalr.min.js.map",
+        "integrity": "sha384-NhsC5uK6TTiwS85pjLl+iQ5z6FguDK3nxZw5DszH1yRBYaTbfAkUhP30YodfW+lZ"
       }
     ]
   }

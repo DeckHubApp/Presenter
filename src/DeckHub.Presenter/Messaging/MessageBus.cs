@@ -41,6 +41,7 @@ namespace DeckHub.Presenter.Messaging
                 var data = MessagePackSerializer.Serialize(show);
                 var message = new Message(data);
                 await _startClient.SendAsync(message).ConfigureAwait(false);
+                _logger.LogInformation($"Sent ServiceBus shows/start message.");
             }
             catch (System.Exception ex)
             {

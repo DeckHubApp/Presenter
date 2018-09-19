@@ -11,6 +11,7 @@ using DeckHub.Presenter.Internals;
 using DeckHub.Presenter.Messaging;
 using DeckHub.Presenter.Options;
 using DeckHub.Presenter.Services;
+using RendleLabs.DeckHub.Cookies;
 using StackExchange.Redis;
 
 namespace DeckHub.Presenter
@@ -77,6 +78,8 @@ namespace DeckHub.Presenter
             {
                 app.UseAuthentication();
             }
+
+            app.UseDeckHubCookieReader();
 
             app.UseMvc(routes =>
             {

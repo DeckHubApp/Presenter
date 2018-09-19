@@ -68,7 +68,15 @@ namespace DeckHub.Presenter.Controllers
         private bool IsCurrentUser(string handle)
         {
             var user = User.FindFirst(DeckHubClaimTypes.Handle)?.Value;
-            return handle.Equals(user, StringComparison.OrdinalIgnoreCase);
+            if (handle.Equals(user, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            else
+            {
+                _logger.LogError($"Current user '{user}' is not '{handle}'.");
+                return false;
+            }
         }
 
         private bool ValidateApiKey(string handle)

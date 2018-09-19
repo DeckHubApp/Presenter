@@ -11,7 +11,7 @@ spec:
         app: presenter
     spec:
       containers:
-      - image: deckhub/presenter:1.0.0-alpha2
+      - image: deckhub/presenter:1.0.0-alpha4
         imagePullPolicy: Always
         name: presenter
         env:
